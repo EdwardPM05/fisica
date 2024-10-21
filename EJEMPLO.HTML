@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Montaña Rusa y Energía Mecánica</title>
+    <style>
+        canvas {
+            border: 2px solid black;
+            background-color: #e0e0e0;
+        }
+        .info {
+            margin: 20px 0;
+            font-family: Arial, sans-serif;
+        }
+        .controls {
+            margin: 10px 0;
+        }
+        .btn {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .energy-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            margin: 5px 0;
+            position: relative;
+        }
+        .energy-fill {
+            height: 100%;
+            text-align: right;
+            color: white;
+            padding-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Simulación de Montaña Rusa</h1>
+<canvas id="montanaRusa" width="800" height="400"></canvas>
+
+<div class="controls">
+    <label for="masa">Masa del Carrito (kg):</label>
+    <input type="range" id="masa" min="1" max="10" value="5" step="1">
+    <span id="masaValue">5 kg</span>
+</div>
+
+<div class="controls">
+    <label for="velocidad">Velocidad del Carrito (m/s):</label>
+    <input type="range" id="velocidad" min="1" max="10" value="1" step="0.5">
+    <span id="velocidadValue">1 m/s</span>
+</div>
+
+<div class="info">
+    <p id="energiaPotencial">Energía Potencial: 0 J</p>
+    <div class="energy-bar" id="energiaPotencialBar">
+        <div class="energy-fill" id="energiaPotencialFill" style="width: 0%; background-color: blue;">0 J</div>
+    </div>
+    
+    <p id="energiaCinetica">Energía Cinética: 0 J</p>
+    <div class="energy-bar" id="energiaCineticaBar">
+        <div class="energy-fill" id="energiaCineticaFill" style="width: 0%; background-color: green;">0 J</div>
+    </div>
+    
+    <p id="energiaTotal">Energía Total: 0 J</p>
+    <div class="energy-bar" id="energiaTotalBar">
+        <div class="energy-fill" id="energiaTotalFill" style="width: 0%; background-color: red;">0 J</div>
+    </div>
+</div>
+
+<button class="btn" id="reiniciar">Reiniciar Simulación</button>
+
+<script>
+    const canvas = document.getElementById('montanaRusa');
+    const ctx = canvas.getContext('2d');
+
+    const puntosPista = [
+        {x: 50, y: 300},
+        {x: 150, y: 200},
+        {x: 250, y: 250},
+        {x: 350, y: 100},
+        {x: 450, y: 150},
+        {x: 550, y: 50},
+        {x: 650, y: 150},
+        {x: 750, y: 100},
+        {x: 800, y: 300}
+    ];
+
+    let carritoX = puntosPista[0].x;
+    let carritoIndex = 0;
+    let masa = 5; // Masa del carrito en kg
+    let velocidad = 1; // Velocidad del carrito
+    const g = 9.81; // Gravedad en m/s²
+    let animationId; // Para almacenar el ID de la animación
+
+    // Actualizar masa del carrito
+    document.getElementById('masa').addEventListener('input', function() {
+        masa = parseFloat(this.value);
+        document.getElementById('masaValue').textContent = `${masa} kg`;
+    });
+
+    // Actualizar velocidad del carrito
+    document.getElementById('velocidad').addEventListener('input', function() {
+        velocidad = parseFloat(this.value);
+        document.getElementById('velocidadValue').textContent = `${velocidad} m/s`;
+    });
+
+    function dibujarPista() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Dibujar la pista
+        ctx.beginPath();
+        ctx.moveTo(puntosPista[0].x, puntosPista[0].y);
+        for (let i = 1; i < puntosPista.length; i++) {
+            ctx.lineTo(puntosPista[i].x, puntosPista[i].y);
+        }
+        ctx.strokeStyle = 'brown';
+        ctx.lineWidth = 5;
+        ctx.stroke();
+        
+        // Dibujar el carrito
+        ctx.fillStyle = 'red';
+        ctx.fillRect(carritoX - 10, getCarritoY(carritoX) - 10, 20, 20); // Carrito como un cuadrado
+    }
+
+    function getCarritoY(x) {
+        for (let i = 0; i < puntosPista.length - 1; i++) {
+            if (x >= puntosPista[i].x && x <= puntosPista[i + 1].x) {
+                // Interpolación lineal para calcular la posición y del carrito
+                const t = (x - puntosPista[i].x) / (puntosPista[i + 1].x - puntosPista[i].x);
+                return puntosPista[i].y + t * (puntosPista[i + 1].y - puntosPista[i].y);
+            }
+        }
+        return puntosPista[puntosPista.length - 1].y; // Si el carrito está más allá de la última coordenada
+    }
+
+    function calcularEnergia() {
+        const altura = getCarritoY(carritoX);
+        const energiaPotencial = masa * g * (300 - altura); // Altura inicial de 300
+        const energiaCinetica = 0.5 * masa * Math.pow(velocidad, 2);
+        const energiaTotal = energiaPotencial + energiaCinetica;
+
+        // Actualizar el DOM con las energías
+        document.getElementById('energiaPotencial').textContent = `Energía Potencial: ${energiaPotencial.toFixed(2)} J`;
+        document.getElementById('energiaCinetica').textContent = `Energía Cinética: ${energiaCinetica.toFixed(2)} J`;
+        document.getElementById('energiaTotal').textContent = `Energía Total: ${energiaTotal.toFixed(2)} J`;
+
+        // Actualizar las barras de energía
+        updateEnergyBar('energiaPotencialFill', energiaPotencial);
+        updateEnergyBar('energiaCineticaFill', energiaCinetica);
+        updateEnergyBar('energiaTotalFill', energiaTotal);
+    }
+
+    function updateEnergyBar(barId, energy) {
+        const bar = document.getElementById(barId);
+        const maxEnergy = masa * g * (300 - 0) + 0.5 * masa * Math.pow(10, 2); // Máximo de energía potencial y cinética en valores razonables
+        const percentage = Math.min((energy / maxEnergy) * 100, 100); // Calcular porcentaje
+        bar.style.width = `${percentage}%`;
+        bar.textContent = `${energy.toFixed(2)} J`;
+    }
+
+    function moverCarrito() {
+        // Mover el carrito al siguiente punto
+        if (carritoIndex < puntosPista.length - 1) {
+            carritoX += velocidad; // Mover horizontalmente
+            // Actualizar el índice si se pasa al siguiente punto
+            if (carritoX >= puntosPista[carritoIndex + 1].x) {
+                carritoIndex++;
+            }
+        }
+
+        // Calcular y mostrar la energía
+        calcularEnergia();
+
+        // Dibujar la escena actual
+        dibujarPista();
+        animationId = requestAnimationFrame(moverCarrito);
+    }
+
+    // Reiniciar la simulación
+    document.getElementById('reiniciar').addEventListener('click', function() {
+        // Detener la animación actual
+        cancelAnimationFrame(animationId);
+
+        // Reiniciar variables
+        carritoX = puntosPista[0].x;
+        carritoIndex = 0;
+        
+        // Reiniciar energía
+        masa = 5; 
+        velocidad = 1; 
+        document.getElementById('masa').value = masa;
+        document.getElementById('velocidad').value = velocidad;
+        document.getElementById('masaValue').textContent = `${masa} kg`;
+        document.getElementById('velocidadValue').textContent = `${velocidad} m/s`;
+
+        // Redibujar la pista y reiniciar movimiento
+        dibujarPista();
+        moverCarrito();
+    });
+
+    moverCarrito(); // Iniciar la animación
+</script>
+
+</body>
+</html>
