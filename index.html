@@ -5,16 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Montaña Rusa y Energía Mecánica</title>
     <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+        }
         canvas {
-            border: 2px solid black;
+            display: block;
+            width: 100vw;
+            height: 100vh;
             background-color: #e0e0e0;
         }
-        .info {
-            margin: 20px 0;
-            font-family: Arial, sans-serif;
+        .controls, .info {
+            position: absolute;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
         }
         .controls {
-            margin: 10px 0;
+            top: 20px;
+            right: 20px;
+            width: 220px;
+        }
+        .info {
+            top: 20px;
+            left: 20px;
+            width: 260px;
+            display: none;
         }
         .btn {
             padding: 10px 15px;
@@ -23,6 +41,16 @@
             border: none;
             cursor: pointer;
             border-radius: 5px;
+            margin-right: 10px;
+            width: 100px;
+        }
+        .button-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            justify-content: space-between;
+            width: 400px;
         }
         .energy-bar {
             width: 100%;
@@ -30,7 +58,6 @@
             background-color: #f0f0f0;
             border: 1px solid #ccc;
             margin: 5px 0;
-            position: relative;
         }
         .energy-fill {
             height: 100%;
@@ -42,22 +69,25 @@
 </head>
 <body>
 
-<h1>Simulación de Montaña Rusa</h1>
-<canvas id="montanaRusa" width="800" height="400"></canvas>
+<canvas id="montanaRusa"></canvas>
 
 <div class="controls">
-    <label for="masa">Masa del Carrito (kg):</label>
-    <input type="range" id="masa" min="1" max="10" value="5" step="1">
-    <span id="masaValue">5 kg</span>
+    <label for="masa">Masa (kg):</label>
+    <input type="range" id="masa" min="1" max="50" value="20" step="1">
+    <span id="masaValue">20 kg</span><br><br>
+
+    <label for="velocidad">Velocidad (m/s):</label>
+    <input type="range" id="velocidad" min="1" max="30" value="10" step="0.5">
+    <span id="velocidadValue">10 m/s</span><br><br>
+    
+    <label for="friccion">Coef. de Fricción:</label>
+    <input type="range" id="friccion" min="0" max="1" value="0" step="0.01">
+    <span id="friccionValue">0</span><br><br>
+
+    <button class="btn" id="toggleEnergias">Mostrar Energías</button>
 </div>
 
-<div class="controls">
-    <label for="velocidad">Velocidad del Carrito (m/s):</label>
-    <input type="range" id="velocidad" min="1" max="10" value="1" step="0.5">
-    <span id="velocidadValue">1 m/s</span>
-</div>
-
-<div class="info">
+<div class="info" id="energyInfo">
     <p id="energiaPotencial">Energía Potencial: 0 J</p>
     <div class="energy-bar" id="energiaPotencialBar">
         <div class="energy-fill" id="energiaPotencialFill" style="width: 0%; background-color: blue;">0 J</div>
@@ -74,47 +104,50 @@
     </div>
 </div>
 
-<button class="btn" id="reiniciar">Reiniciar Simulación</button>
+<div class="button-container">
+    <button class="btn" id="reiniciar">Reiniciar</button>
+    <button class="btn" id="pausar">Pausar</button>
+    <button class="btn" id="reanudar">Reanudar</button>
+</div>
 
 <script>
     const canvas = document.getElementById('montanaRusa');
     const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    const puntosPista = [
-        {x: 50, y: 300},
-        {x: 150, y: 200},
-        {x: 250, y: 250},
-        {x: 350, y: 100},
-        {x: 450, y: 150},
-        {x: 550, y: 50},
-        {x: 650, y: 150},
-        {x: 750, y: 100},
-        {x: 800, y: 300}
+    // Definimos los puntos de la pista
+    const puntosPistaBase = [
+        {x: 0, y: 400}, // Tramo recto
+        {x: 100, y: 400},
+        {x: 200, y: 350},
+        {x: 300, y: 200},
+        {x: 400, y: 250},
+        {x: 500, y: 150},
+        {x: 600, y: 250},
+        {x: 700, y: 200},
+        {x: 800, y: 400}
     ];
 
-    let carritoX = puntosPista[0].x;
+    let puntosPista = []; // Para almacenar los puntos centrados
+
+    let carritoX = puntosPistaBase[0].x;
     let carritoIndex = 0;
-    let masa = 5; // Masa del carrito en kg
-    let velocidad = 1; // Velocidad del carrito
-    const g = 9.81; // Gravedad en m/s²
-    let animationId; // Para almacenar el ID de la animación
+    let masa = 20;  // Valor predeterminado aumentado
+    let velocidad = 10;  // Valor predeterminado aumentado
+    let friccion = 0;  // Valor predeterminado de fricción en 0
+    const g = 9.81;
+    let animationId;
+    let isPaused = false;
 
-    // Actualizar masa del carrito
-    document.getElementById('masa').addEventListener('input', function() {
-        masa = parseFloat(this.value);
-        document.getElementById('masaValue').textContent = `${masa} kg`;
-    });
-
-    // Actualizar velocidad del carrito
-    document.getElementById('velocidad').addEventListener('input', function() {
-        velocidad = parseFloat(this.value);
-        document.getElementById('velocidadValue').textContent = `${velocidad} m/s`;
-    });
+    function centrarPista() {
+        const totalWidth = puntosPistaBase[puntosPistaBase.length - 1].x;
+        const offsetX = (canvas.width - totalWidth) / 2;
+        puntosPista = puntosPistaBase.map(p => ({ x: p.x + offsetX, y: p.y + 100 }));
+    }
 
     function dibujarPista() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Dibujar la pista
         ctx.beginPath();
         ctx.moveTo(puntosPista[0].x, puntosPista[0].y);
         for (let i = 1; i < puntosPista.length; i++) {
@@ -124,34 +157,30 @@
         ctx.lineWidth = 5;
         ctx.stroke();
         
-        // Dibujar el carrito
         ctx.fillStyle = 'red';
-        ctx.fillRect(carritoX - 10, getCarritoY(carritoX) - 10, 20, 20); // Carrito como un cuadrado
+        ctx.fillRect(carritoX - 10, getCarritoY(carritoX) - 10, 20, 20);
     }
 
     function getCarritoY(x) {
         for (let i = 0; i < puntosPista.length - 1; i++) {
             if (x >= puntosPista[i].x && x <= puntosPista[i + 1].x) {
-                // Interpolación lineal para calcular la posición y del carrito
                 const t = (x - puntosPista[i].x) / (puntosPista[i + 1].x - puntosPista[i].x);
                 return puntosPista[i].y + t * (puntosPista[i + 1].y - puntosPista[i].y);
             }
         }
-        return puntosPista[puntosPista.length - 1].y; // Si el carrito está más allá de la última coordenada
+        return puntosPista[puntosPista.length - 1].y;
     }
 
     function calcularEnergia() {
         const altura = getCarritoY(carritoX);
-        const energiaPotencial = masa * g * (300 - altura); // Altura inicial de 300
+        const energiaPotencial = masa * g * (400 - altura);
         const energiaCinetica = 0.5 * masa * Math.pow(velocidad, 2);
         const energiaTotal = energiaPotencial + energiaCinetica;
 
-        // Actualizar el DOM con las energías
         document.getElementById('energiaPotencial').textContent = `Energía Potencial: ${energiaPotencial.toFixed(2)} J`;
         document.getElementById('energiaCinetica').textContent = `Energía Cinética: ${energiaCinetica.toFixed(2)} J`;
         document.getElementById('energiaTotal').textContent = `Energía Total: ${energiaTotal.toFixed(2)} J`;
 
-        // Actualizar las barras de energía
         updateEnergyBar('energiaPotencialFill', energiaPotencial);
         updateEnergyBar('energiaCineticaFill', energiaCinetica);
         updateEnergyBar('energiaTotalFill', energiaTotal);
@@ -159,53 +188,77 @@
 
     function updateEnergyBar(barId, energy) {
         const bar = document.getElementById(barId);
-        const maxEnergy = masa * g * (300 - 0) + 0.5 * masa * Math.pow(10, 2); // Máximo de energía potencial y cinética en valores razonables
-        const percentage = Math.min((energy / maxEnergy) * 100, 100); // Calcular porcentaje
+        const maxEnergy = masa * g * (400 - 0) + 0.5 * masa * Math.pow(10, 2);
+        const percentage = Math.min((energy / maxEnergy) * 100, 100);
         bar.style.width = `${percentage}%`;
         bar.textContent = `${energy.toFixed(2)} J`;
     }
 
     function moverCarrito() {
-        // Mover el carrito al siguiente punto
+        if (isPaused) return;
+
         if (carritoIndex < puntosPista.length - 1) {
-            carritoX += velocidad; // Mover horizontalmente
-            // Actualizar el índice si se pasa al siguiente punto
+            carritoX += velocidad;
             if (carritoX >= puntosPista[carritoIndex + 1].x) {
                 carritoIndex++;
+                velocidad -= friccion; // La fricción reduce la velocidad
             }
         }
-
-        // Calcular y mostrar la energía
-        calcularEnergia();
-
-        // Dibujar la escena actual
         dibujarPista();
-        animationId = requestAnimationFrame(moverCarrito);
+        calcularEnergia();
+        if (carritoIndex < puntosPista.length - 1) {
+            animationId = requestAnimationFrame(moverCarrito);
+        }
     }
 
-    // Reiniciar la simulación
-    document.getElementById('reiniciar').addEventListener('click', function() {
-        // Detener la animación actual
-        cancelAnimationFrame(animationId);
+    document.getElementById('masa').addEventListener('input', (e) => {
+        masa = parseFloat(e.target.value);
+        document.getElementById('masaValue').textContent = `${masa} kg`;
+    });
 
-        // Reiniciar variables
+    document.getElementById('velocidad').addEventListener('input', (e) => {
+        velocidad = parseFloat(e.target.value);
+        document.getElementById('velocidadValue').textContent = `${velocidad} m/s`;
+    });
+
+    document.getElementById('friccion').addEventListener('input', (e) => {
+        friccion = parseFloat(e.target.value);
+        document.getElementById('friccionValue').textContent = friccion.toFixed(2);
+    });
+
+    document.getElementById('toggleEnergias').addEventListener('click', () => {
+        const energyInfo = document.getElementById('energyInfo');
+        energyInfo.style.display = energyInfo.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.getElementById('reiniciar').addEventListener('click', () => {
+        masa = 20;
+        velocidad = 10;
+        friccion = 0;
         carritoX = puntosPista[0].x;
         carritoIndex = 0;
-        
-        // Reiniciar energía
-        masa = 5; 
-        velocidad = 1; 
         document.getElementById('masa').value = masa;
         document.getElementById('velocidad').value = velocidad;
+        document.getElementById('friccion').value = friccion;
         document.getElementById('masaValue').textContent = `${masa} kg`;
         document.getElementById('velocidadValue').textContent = `${velocidad} m/s`;
-
-        // Redibujar la pista y reiniciar movimiento
+        document.getElementById('friccionValue').textContent = friccion.toFixed(2);
+        calcularEnergia();
         dibujarPista();
+    });
+
+    document.getElementById('pausar').addEventListener('click', () => {
+        isPaused = true;
+    });
+
+    document.getElementById('reanudar').addEventListener('click', () => {
+        isPaused = false;
         moverCarrito();
     });
 
-    moverCarrito(); // Iniciar la animación
+    centrarPista();
+    dibujarPista();
+    calcularEnergia();
 </script>
 
 </body>
