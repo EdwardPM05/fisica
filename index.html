@@ -5,96 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Montaña Rusa y Energía Mecánica</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            overflow: hidden;
-        }
-    
-        /* Contenedor del canvas con proporciones horizontales */
-        #montanaRusaContainer {
-            width: 90vw; /* Ocupa el 90% del ancho de la pantalla */
-            height: 50vh; /* Ocupa el 50% de la altura de la pantalla */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #e0e0e0;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-    
-        canvas {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-    
-        .controls, .info {
-            position: absolute;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            font-size: 14px;
-            max-width: 250px;
-        }
-    
+    body, html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100%;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    #montanaRusaContainer {
+        width: 80%;
+        height: 60vh; /* Ajustamos la altura del contenedor */
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    canvas {
+        width: 100%;
+        height: 100%;
+        background-color: #e0e0e0;
+        object-fit: contain; /* Asegura que la montaña rusa no se distorsione */
+    }
+
+    .controls, .info {
+        position: absolute;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 8px;
+        font-size: 14px;
+        max-width: 300px;
+        width: 90%;
+        box-sizing: border-box;
+    }
+
+    .controls {
+        top: 20px;
+        right: 10px;
+        max-width: 250px;
+    }
+
+    .info {
+        top: 20px;
+        left: 10px;
+        max-width: 250px;
+        display: none;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-right: 10px;
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 5px;
+    }
+
+    .button-container {
+        position: absolute;
+        bottom: 20px;
+        left: 10px;
+        right: 10px;
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .energy-bar {
+        width: 100%;
+        height: 20px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        margin: 5px 0;
+        box-sizing: border-box;
+    }
+
+    .energy-fill {
+        height: 100%;
+        text-align: right;
+        color: white;
+        padding-right: 5px;
+    }
+
+    @media screen and (max-width: 600px) {
         .controls {
-            top: 20px;
+            top: 10px;
             right: 10px;
+            width: 90%;
+            font-size: 12px;
         }
-    
-        .info {
-            top: 20px;
-            left: 10px;
-            display: none;
-        }
-    
         .button-container {
-            position: absolute;
-            bottom: 20px;
+            bottom: 10px;
             left: 10px;
             right: 10px;
             display: flex;
-            justify-content: space-around;
-            width: 100%;
-            box-sizing: border-box;
+            justify-content: space-between;
         }
-    
         .btn {
-            padding: 10px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
+            padding: 8px 12px;
             width: 30%;
+            font-size: 12px;
         }
-    
-        @media screen and (orientation: landscape) {
-            /* Ajuste para dispositivos en modo horizontal */
-            #montanaRusaContainer {
-                width: 80vw; /* Aumenta el ancho en modo horizontal */
-                height: 40vh; /* Reduce un poco la altura */
-            }
-    
-            .controls, .info, .button-container {
-                font-size: 12px;
-            }
+        .info {
+            width: 90%;
+            font-size: 12px;
         }
-    </style>
-    
+    }
+</style>
 </head>
 <body>
-<div id="montanaRusaContainer">
-    <canvas id="montanaRusa"></canvas>
-</div>
-    
+
+<canvas id="montanaRusa"></canvas>
+
 <div class="controls">
     <label for="masa">Masa (kg):</label>
     <input type="range" id="masa" min="1" max="50" value="20" step="1">
