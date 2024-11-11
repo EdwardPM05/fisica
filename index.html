@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Montaña Rusa y Energía Mecánica</title>
     <style>
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            z-index: 10000;
+        }
         body, html {
             margin: 0;
             padding: 0;
@@ -43,7 +57,6 @@
             border-radius: 5px;
             margin-top: 5px;
         }
-
         .buttons-container {
             position: absolute;
             bottom: 20px;
@@ -52,11 +65,9 @@
             gap: 10px;
             flex-direction: row;
         }
-
         .btn-reiniciar {
             background-color: #f44336;
         }
-        
         .popup {
             display: none;
             position: absolute;
@@ -70,15 +81,12 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             z-index: 1000;
         }
-        
-        /* Estilo de la calculadora */
         .calculator {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             margin-top: 10px;
         }
-
         .calculator button {
             padding: 15px;
             font-size: 18px;
@@ -88,12 +96,11 @@
             border: none;
             border-radius: 5px;
         }
-
     </style>
 </head>
 <body>
 
-
+<div id="splash-screen">ENERGIA MECANICA</div>
 <canvas id="montanaRusa"></canvas>
 
 <div class="controls">
@@ -150,15 +157,21 @@
 <button class="btn" id="abrirCalculadora">Calculadora</button>
 
 <script>
+    window.onload = function() {
+        setTimeout(() => {
+            document.getElementById('splash-screen').style.display = 'none';
+        }, 2000);
+    };
+
     const canvas = document.getElementById('montanaRusa');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
     const fondo = new Image();
-    fondo.src = './images/cccc.png'; // Reemplaza con la ruta de tu imagen
+    fondo.src = './images/cccc.png';
     fondo.onload = function() {
-        actualizar(); // Iniciar la animación una vez cargado el fondo
+        actualizar(); 
     };
 
     const puntosPistaBase = [
@@ -233,17 +246,17 @@
     }
 
     const carritoImg = new Image();
-    carritoImg.src = './images/juego.png'; // Cambia la ruta a la de tu imagen
+    carritoImg.src = './images/juego.png'; 
 
     carritoImg.onload = function() {
-        actualizar(); // Comienza la animación una vez que la imagen esté cargada
+        actualizar(); 
     };
 
     const fantasmitaImg = new Image();
-    fantasmitaImg.src = './images/opcion2.png'; // Cambia la ruta a la de tu imagen de fantasmita
+    fantasmitaImg.src = './images/opcion2.png'; 
 
     fantasmitaImg.onload = function() {
-        actualizar(); // Inicia la animación una vez que la imagen del fantasmita esté cargada
+        actualizar(); 
     };
 
     function dibujarPista() {
@@ -261,27 +274,23 @@
         ctx.lineTo(puntosPista[i].x, puntosPista[i].y);
     }
     
-    ctx.setLineDash([15, 10]); // Configuración de la línea punteada
+    ctx.setLineDash([15, 10]); 
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 5;
     ctx.stroke();
-    ctx.setLineDash([]); // Restablecer el estilo para no afectar otros dibujos
+    ctx.setLineDash([]); 
 
-    // Dibuja un fantasmita en cada nodo de la pista
     puntosPista.forEach((punto) => {
-        const fantasmitaWidth = 50; // Tamaño de la imagen del fantasmita
+        const fantasmitaWidth = 50; 
         const fantasmitaHeight = 50;
         ctx.drawImage(fantasmitaImg, punto.x - fantasmitaWidth / 2, punto.y - fantasmitaHeight / 2, fantasmitaWidth, fantasmitaHeight);
     });
 
-    // Dibuja la imagen del carrito en lugar del cuadrado
     const carritoY = getCarritoY(carritoX);
-    const carritoWidth = 60; // Ajusta el tamaño de la imagen
+    const carritoWidth = 60; 
     const carritoHeight = 60; 
     ctx.drawImage(carritoImg, carritoX - carritoWidth / 2, carritoY - carritoHeight / 2, carritoWidth, carritoHeight);
 }
-
-
 
     function getCarritoY(x) {
         for (let i = 0; i < puntosPista.length - 1; i++) {
@@ -310,7 +319,7 @@
 
     function updateEnergyBar(barId, energy) {
         const bar = document.getElementById(barId);
-        const maxEnergy = masa * g * (400 - 0) + 0.5 * masa * Math.pow(20, 2); // Max energy (in Joules)
+        const maxEnergy = masa * g * (400 - 0) + 0.5 * masa * Math.pow(20, 2); 
         const fillWidth = Math.min((energy / maxEnergy) * 100, 100);
         bar.style.width = fillWidth + '%';
         bar.textContent = `${energy.toFixed(2)} J`;
@@ -318,8 +327,8 @@
 
     function moverCarrito() {
         if (!isPaused) {
-            velocidad -= friccion * 0.1; // Aplicar un factor de escala
-            velocidad = Math.max(velocidad, 0.05); // Establecer una velocidad mínima
+            velocidad -= friccion * 0.1; 
+            velocidad = Math.max(velocidad, 0.05); 
 
             carritoX += velocidad;
             if (carritoX > puntosPista[puntosPista.length - 1].x) {
