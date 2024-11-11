@@ -232,35 +232,45 @@
         puntosPista = puntosPistaBase.map(p => ({ x: p.x + offsetX, y: p.y + 100 }));
     }
 
-    function dibujarPista() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Dibujar el fondo con blanqueamiento
-        ctx.drawImage(fondo, 0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Capa blanca semitransparente (ajusta la opacidad según sea necesario)
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const carritoImg = new Image();
+carritoImg.src = './images/gusano.png'; // Cambia la ruta a la de tu imagen
 
-        ctx.beginPath();
-        ctx.moveTo(puntosPista[0].x, puntosPista[0].y);
-        for (let i = 1; i < puntosPista.length; i++) {
-            ctx.lineTo(puntosPista[i].x, puntosPista[i].y);
-        }
-        ctx.strokeStyle = 'brown';
-        ctx.lineWidth = 5;
-        ctx.stroke();
-        
-        puntosPista.forEach((punto, index) => {
-            ctx.fillStyle = 'red';
-            ctx.beginPath();
-            ctx.arc(punto.x, punto.y, 10, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = 'black';
-            ctx.stroke();
-        });
+carritoImg.onload = function() {
+    actualizar(); // Comienza la animación una vez que la imagen esté cargada
+};
 
-        ctx.fillStyle = 'red';
-        ctx.fillRect(carritoX - 10, getCarritoY(carritoX) - 10, 20, 20);
+function dibujarPista() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Dibuja el fondo y la pista, igual que antes
+    ctx.drawImage(fondo, 0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.beginPath();
+    ctx.moveTo(puntosPista[0].x, puntosPista[0].y);
+    for (let i = 1; i < puntosPista.length; i++) {
+        ctx.lineTo(puntosPista[i].x, puntosPista[i].y);
     }
+    ctx.strokeStyle = 'brown';
+    ctx.lineWidth = 5;
+    ctx.stroke();
+
+    puntosPista.forEach((punto, index) => {
+        ctx.fillStyle = 'red';
+        ctx.beginPath();
+        ctx.arc(punto.x, punto.y, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'black';
+        ctx.stroke();
+    });
+
+    // Dibuja la imagen del carrito en lugar del cuadrado
+    const carritoY = getCarritoY(carritoX);
+    const carritoWidth = 60; // Ajusta el tamaño de la imagen
+    const carritoHeight = 60; 
+    ctx.drawImage(carritoImg, carritoX - carritoWidth / 2, carritoY - carritoHeight / 2, carritoWidth, carritoHeight);
+}
 
 
 
