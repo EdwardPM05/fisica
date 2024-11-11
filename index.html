@@ -20,7 +20,7 @@
         .controls, .info {
             position: absolute;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgb(255, 255, 255);
             border-radius: 8px;
         }
         .controls {
@@ -156,7 +156,7 @@
     canvas.height = window.innerHeight;
 
     const fondo = new Image();
-    fondo.src = './images/park-sky-forest-powerpoint-background_b26f447f3f__960_540.png'; // Reemplaza con la ruta de tu imagen
+    fondo.src = './images/cccc.png'; // Reemplaza con la ruta de tu imagen
     fondo.onload = function() {
         actualizar(); // Iniciar la animación una vez cargado el fondo
     };
@@ -233,18 +233,18 @@
     }
 
     const carritoImg = new Image();
-carritoImg.src = './images/gusano.png'; // Cambia la ruta a la de tu imagen
+    carritoImg.src = './images/juego.png'; // Cambia la ruta a la de tu imagen
 
-carritoImg.onload = function() {
-    actualizar(); // Comienza la animación una vez que la imagen esté cargada
-};
+    carritoImg.onload = function() {
+        actualizar(); // Comienza la animación una vez que la imagen esté cargada
+    };
 
 function dibujarPista() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Dibuja el fondo y la pista, igual que antes
     ctx.drawImage(fondo, 0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.beginPath();
@@ -252,7 +252,8 @@ function dibujarPista() {
     for (let i = 1; i < puntosPista.length; i++) {
         ctx.lineTo(puntosPista[i].x, puntosPista[i].y);
     }
-    ctx.strokeStyle = 'brown';
+
+    ctx.strokeStyle = 'red';
     ctx.lineWidth = 5;
     ctx.stroke();
 
