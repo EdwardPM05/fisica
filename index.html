@@ -169,7 +169,7 @@
     canvas.height = window.innerHeight;
 
     const fondo = new Image();
-    fondo.src = './images/cccc.png';
+    fondo.src = './images/restaurant.png';
     fondo.onload = function() {
         actualizar(); 
     };
@@ -246,14 +246,14 @@
     }
 
     const carritoImg = new Image();
-    carritoImg.src = './images/juego.png'; 
+    carritoImg.src = './images/gordo.png'; 
 
     carritoImg.onload = function() {
         actualizar(); 
     };
 
     const fantasmitaImg = new Image();
-    fantasmitaImg.src = './images/opcion2.png'; 
+    fantasmitaImg.src = './images/hamburguesa.png'; 
 
     fantasmitaImg.onload = function() {
         actualizar(); 
@@ -281,14 +281,14 @@
     ctx.setLineDash([]); 
 
     puntosPista.forEach((punto) => {
-        const fantasmitaWidth = 50; 
-        const fantasmitaHeight = 50;
+        const fantasmitaWidth = 40; 
+        const fantasmitaHeight = 40;
         ctx.drawImage(fantasmitaImg, punto.x - fantasmitaWidth / 2, punto.y - fantasmitaHeight / 2, fantasmitaWidth, fantasmitaHeight);
     });
 
     const carritoY = getCarritoY(carritoX);
-    const carritoWidth = 60; 
-    const carritoHeight = 60; 
+    const carritoWidth = 120; 
+    const carritoHeight = 120; 
     ctx.drawImage(carritoImg, carritoX - carritoWidth / 2, carritoY - carritoHeight / 2, carritoWidth, carritoHeight);
 }
 
