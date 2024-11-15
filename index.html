@@ -170,7 +170,7 @@
     canvas.height = window.innerHeight;
 
     const fondo = new Image();
-    fondo.src = './images/restaurant.png';
+    fondo.src = './images/park-sky-forest-powerpoint-background_b26f447f3f__960_540.png';
     fondo.onload = function() {
         actualizar(); 
     };
@@ -243,14 +243,14 @@
     }
 
     const carritoImg = new Image();
-    carritoImg.src = './images/gordo.png'; 
+    carritoImg.src = './images/carro-deportivo.png'; 
 
     carritoImg.onload = function() {
         actualizar(); 
     };
 
     const fantasmitaImg = new Image();
-    fantasmitaImg.src = './images/hamburguesa.png'; 
+    fantasmitaImg.src = './images/señal.png'; 
 
     fantasmitaImg.onload = function() {
         actualizar(); 
@@ -278,14 +278,14 @@
     ctx.setLineDash([]); 
 
     puntosPista.forEach((punto) => {
-        const fantasmitaWidth = 40; 
-        const fantasmitaHeight = 40;
+        const fantasmitaWidth = 70; 
+        const fantasmitaHeight = 70;
         ctx.drawImage(fantasmitaImg, punto.x - fantasmitaWidth / 2, punto.y - fantasmitaHeight / 2, fantasmitaWidth, fantasmitaHeight);
     });
 
     const carritoY = getCarritoY(carritoX);
-    const carritoWidth = 120; 
-    const carritoHeight = 120; 
+    const carritoWidth = 50; 
+    const carritoHeight = 50; 
     ctx.drawImage(carritoImg, carritoX - carritoWidth / 2, carritoY - carritoHeight / 2, carritoWidth, carritoHeight);
 }
 
@@ -305,7 +305,7 @@
         const energiaCinetica = 0.5 * masa * Math.pow(velocidad, 2);
         const energiaTotal = energiaPotencial + energiaCinetica;
 
-        document.getElementById('energiaPotencial').textContent = `Energía Potencial: ${energiaPotencial.toFixed(2)} J`;
+        document.getElementById('energiaPotencial').textContent = `Energía Potencial: ${energiaPotencial.toFixed(2)} `J;
         document.getElementById('energiaCinetica').textContent = `Energía Cinética: ${energiaCinetica.toFixed(2)} J`;
         document.getElementById('energiaTotal').textContent = `Energía Total: ${energiaTotal.toFixed(2)} J`;
 
@@ -319,7 +319,7 @@
         const maxEnergy = masa * g * (400 - 0) + 0.5 * masa * Math.pow(20, 2); 
         const fillWidth = Math.min((energy / maxEnergy) * 100, 100);
         bar.style.width = fillWidth + '%';
-        bar.textContent = `${energy.toFixed(2)} J`;
+        bar.textContent = `${energy.toFixed(2)}`;
     }
 
     function moverCarrito() {
