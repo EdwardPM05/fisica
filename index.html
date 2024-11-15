@@ -305,7 +305,7 @@
         const energiaCinetica = 0.5 * masa * Math.pow(velocidad, 2);
         const energiaTotal = energiaPotencial + energiaCinetica;
 
-        document.getElementById('energiaPotencial').textContent = `Energía Potencial: ${energiaPotencial.toFixed(2)} `J;
+        document.getElementById('energiaPotencial').textContent = `Energía Potencial: ${energiaPotencial.toFixed(2)} J`;
         document.getElementById('energiaCinetica').textContent = `Energía Cinética: ${energiaCinetica.toFixed(2)} J`;
         document.getElementById('energiaTotal').textContent = `Energía Total: ${energiaTotal.toFixed(2)} J`;
 
@@ -319,7 +319,7 @@
         const maxEnergy = masa * g * (400 - 0) + 0.5 * masa * Math.pow(20, 2); 
         const fillWidth = Math.min((energy / maxEnergy) * 100, 100);
         bar.style.width = fillWidth + '%';
-        bar.textContent = `${energy.toFixed(2)}`;
+        bar.textContent = `${energy.toFixed(2)} J`;
     }
 
     function moverCarrito() {
